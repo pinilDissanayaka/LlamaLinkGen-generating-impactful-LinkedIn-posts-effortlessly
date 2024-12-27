@@ -50,5 +50,5 @@ def query_rewriter(state: GraphState) -> GraphState:
     rewrite_query = agent_response.re_write_query
 
     return {
-        "messages": AIMessage(content=rewrite_query),
+        "messages": AIMessage(content=rewrite_query)
     }

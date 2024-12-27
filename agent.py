@@ -1,15 +1,8 @@
-import os
-from typing import Annotated, Sequence, TypedDict
-from langchain_core.messages import BaseMessage, AIMessage, HumanMessage, ToolMessage
-from langgraph.prebuilt import ToolNode, create_react_agent
-from langgraph.graph import add_messages, StateGraph, START, END
-from langchain_community.tools import DuckDuckGoSearchResults
-from langchain_core.tools import tool
-from langchain_groq.chat_models import ChatGroq
 from dotenv import load_dotenv, find_dotenv
-from langchain_experimental.utilities import PythonREPL
-from agents import query_rewriter
+from agents import query_rewriter, router_between_generation_and_web_search, condition_between_generation_and_web_search
 from utils import GraphState
+from langgraph.graph import StateGraph, START, END
+
 
 
 load_dotenv(find_dotenv())
@@ -73,13 +66,18 @@ def write_log_node(state: GraphState):
 
 
 
-
 graph_builder = StateGraph(GraphState)
 
-graph_builder.add_node("re_writer", query_rewriter)
+graph_builder.add_node("Query_rewriter", query_rewriter)
+graph_builder.add_node("Router_between_generation_and_web_search", router_between_generation_and_web_search)
 
+graph_builder.add_edge(START, "Router_between_generation_and_web_search")
 
-graph_builder.add_edge(START, "re_writer")
+graph_builder.add_conditional_edges(
+    "Router_between_generation_and_web_search",
+    condition_between_generation_and_web_search,
+    {"web_search": "Query_rewriter", "generate": END}
+)
 
 
 graph = graph_builder.compile()
@@ -87,7 +85,4 @@ graph = graph_builder.compile()
 input_query=str(input("Enter input : "))
 for chunk in graph.stream(input={"messages": input_query}, stream_mode="values"):
     chunk["messages"][-1].pretty_print()
-
-
-
 

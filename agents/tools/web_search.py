@@ -10,7 +10,7 @@ load_dotenv(find_dotenv())
 
 
 
-
+@tool
 def web_search_tool(query: str) -> str:
     """
     This function performs a web search using the Google SERP API and returns the results as a string.
@@ -41,7 +41,7 @@ def web_search_tool(query: str) -> str:
     # Return the search results as a string
     return json.dumps(web_search_response)
 
-
+@tool
 def open_web_page(urls: list) -> str:
     """
     Loads and splits the content of web pages from the given URLs.
