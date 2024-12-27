@@ -1,6 +1,6 @@
 from dotenv import load_dotenv, find_dotenv
 from agents import query_rewriter, router_between_generation_and_web_search, condition_between_generation_and_web_search
-from agents import research_agent
+from agents import web_search_agent, article_writer_agent
 from utils import GraphState
 from langgraph.graph import StateGraph, START, END
 
@@ -71,7 +71,8 @@ graph_builder = StateGraph(GraphState)
 
 graph_builder.add_node("Query_rewriter", query_rewriter)
 graph_builder.add_node("Router_between_generation_and_web_search", router_between_generation_and_web_search)
-graph_builder.add_node("Web_search", research_agent)
+graph_builder.add_node("Web_search", web_search_agent)
+graph_builder.add_node("Content_writer", article_writer_agent)
 
 graph_builder.add_edge(START, "Router_between_generation_and_web_search")
 
@@ -83,6 +84,7 @@ graph_builder.add_conditional_edges(
 
 graph_builder.add_edge("Query_rewriter", "Web_search")
 
+graph_builder.add_edge("Web_search", "Content_writer")
 
 graph = graph_builder.compile()
 

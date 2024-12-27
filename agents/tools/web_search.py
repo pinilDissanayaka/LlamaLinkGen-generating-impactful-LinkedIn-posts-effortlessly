@@ -60,6 +60,3 @@ def open_web_page(urls: list) -> str:
 
     # Return the loaded web page content
     return loaded_web_page
-
-    
-print(open_web_page(["https://www.coursera.org/articles/history-of-ai"]))
