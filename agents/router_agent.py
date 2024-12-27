@@ -57,6 +57,8 @@ def condition_between_generation_and_web_search(state: GraphState):
     """
     router_state = state["router_state"][-1].content
 
+    print(router_state)
+
     if router_state == "web_search":
         # If the router says to web search, then go to the web search node
         return "web_search"
