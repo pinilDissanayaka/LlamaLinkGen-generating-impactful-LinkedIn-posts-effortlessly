@@ -25,7 +25,3 @@ def web_search_tool(query: str) -> str:
     search_results = search_engine.invoke(input=query)
 
     return search_results
-
-
-
-print(web_search_tool("Ai in 2025"))
