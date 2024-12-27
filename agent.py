@@ -12,6 +12,10 @@ from agents import query_rewriter
 from utils import GraphState
 
 
+load_dotenv(find_dotenv())
+
+
+
 '''load_dotenv(find_dotenv())
 
 os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
@@ -80,7 +84,8 @@ graph_builder.add_edge(START, "re_writer")
 
 graph = graph_builder.compile()
 
-for chunk in graph.stream(input={"messages": "Economy in sri lanka at last two years"}, stream_mode="values"):
+input_query=str(input("Enter input : "))
+for chunk in graph.stream(input={"messages": input_query}, stream_mode="values"):
     chunk["messages"][-1].pretty_print()
 
 
