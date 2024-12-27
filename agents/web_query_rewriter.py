@@ -1,13 +1,14 @@
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from langchain_core.runnables import RunnablePassthrough
-from ..utils import llm
+from utils import llm, GraphState
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 
 class QueryRewriter(BaseModel):
     re_write_query:str=Field(description="Reword their query with out preamble or explanation.")
 
-def query_rewriter(query: str) -> str:
+def query_rewriter(state: GraphState) -> GraphState:
     """
     Rewrites a given query to be the most effective web search string possible.
 
@@ -40,10 +41,14 @@ def query_rewriter(query: str) -> str:
         agent_llm
     )
 
+    query=state["messages"][-1].content
+
     # Invoke the agent chain to get the rewritten query
     agent_response = agent_chain.invoke({"QUESTION": query})
 
     # Extract the rewritten query from the agent's response
     rewrite_query = agent_response.re_write_query
 
-    return rewrite_query
+    return {
+        "messages": AIMessage(content=rewrite_query),
+    }

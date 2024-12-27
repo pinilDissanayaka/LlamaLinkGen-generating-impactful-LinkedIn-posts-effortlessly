@@ -19,3 +19,8 @@ llm=ChatGroq(
     model_name="llama-3.3-70b-versatile",
     temperature=0.7
 )
+
+
+class GraphState(TypedDict):
+    messages: Annotated[Sequence[BaseMessage], add_messages]
+    context: str

@@ -8,9 +8,11 @@ from langchain_core.tools import tool
 from langchain_groq.chat_models import ChatGroq
 from dotenv import load_dotenv, find_dotenv
 from langchain_experimental.utilities import PythonREPL
+from agents import query_rewriter
+from utils import GraphState
 
 
-load_dotenv(find_dotenv())
+'''load_dotenv(find_dotenv())
 
 os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
 
@@ -63,25 +65,24 @@ def write_log_node(state: GraphState):
     with open("log.txt", "w") as log_file:
         log_file.write(data)
 
-
+'''
 
 
 
 
 graph_builder = StateGraph(GraphState)
 
-graph_builder.add_node("research_agent", research_node)
-graph_builder.add_node("write_log_node", write_log_node)
+graph_builder.add_node("re_writer", query_rewriter)
 
 
-graph_builder.add_edge(START, "research_agent")
-graph_builder.add_edge("research_agent", "write_log_node")
-
-
-
+graph_builder.add_edge(START, "re_writer")
 
 
 graph = graph_builder.compile()
 
 for chunk in graph.stream(input={"messages": "Economy in sri lanka at last two years"}, stream_mode="values"):
     chunk["messages"][-1].pretty_print()
+
+
+
+
