@@ -1,0 +1,1 @@
+from .market_research import market_researcher
