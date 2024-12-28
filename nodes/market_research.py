@@ -39,32 +39,29 @@ def search(query:str, limit=2):
 @tool
 def search_linkedin(query: str) -> str:
     """
-    Searches for the given query on LinkedIn and returns the search results.
+    Searches for the given query on web and returns the search results.
 
     Parameters:
-    query (str): The search query to search for on LinkedIn
+    query (str): The search query to search for on web
 
     Returns:
     str: The search results
     """
-    return search(f"site:linkedin.com {query}")
+    return search(f"{query}")
 
 
 
 def market_researcher(state: GraphState):
     market_researcher_prompt_template="""
-        You are an expert at Investigate the latest trends.
-        Investigate the latest trends, hashtags, and competitor activities on 
-        Linkedin specific to the industry of this Linkedin account. 
-        Focus on gathering data that reveals what content performs well in the current year, 
-        identifying patterns, preferences, and emerging trends. 
-
-            Current date: {CURRENT_DATE}
-
-        Description of the Linkedin account for which you are doing this research: 
-            Linkedin Account Description : {LINKEDIN_ACCOUNT_DESCRIPTION}
-
-        Find the most relevant topics, hashtags and trends to use the the posts for next week. 
+        You are best at researching a topic. 
+            topic : {TOPIC}
+        You should do a thorough research.
+        Your output will be used by a chart generator agent to visually display the data. 
+        Hence you should provide accurate data. 
+        Also specify the chart types like bar-chart, pie chart etc. 
+        that will effectively display the data. 
+        The chart generator may ask for more information, 
+        so be prepared to do further research and provide it.
     """
 
 
@@ -74,24 +71,21 @@ def market_researcher(state: GraphState):
 
 
 
-    current_date = datetime.now().strftime("%Y-%m-%d")
     message=state["messages"][-1].content
 
-    llm_with_tools = llm.bind_tools([search_linkedin])
+    llm_with_tools = llm.bind_tools([DuckDuckGoSearchResults(api_wrapper=DuckDuckGoSearchAPIWrapper())])
 
 
     market_researcher_chain = (
-        {"LINKEDIN_ACCOUNT_DESCRIPTION": RunnablePassthrough(), "CURRENT_DATE":RunnablePassthrough()} |
+        {"TOPIC": RunnablePassthrough()} |
         market_researcher_prompt |
         llm_with_tools 
     )
 
 
     market_researcher_chain_response = market_researcher_chain.invoke(
-        {"LINKEDIN_ACCOUNT_DESCRIPTION" : message, "CURRENT_DATE": current_date}
+        {"TOPIC" : message}
     )
-
-    print(market_researcher_chain_response)
 
     return {
         "messages": market_researcher_chain_response
@@ -108,7 +102,13 @@ def market_researcher_to_tool(state:GraphState)->str:
 
 
 
-market_researcher_tool=ToolNode([search_linkedin])
+market_researcher_tool=ToolNode([DuckDuckGoSearchResults(api_wrapper=DuckDuckGoSearchAPIWrapper())])
+
+
+
+def print_result(state: GraphState):
+    print("result")
+    print(state["messages"][-1].content)
     
 
 
