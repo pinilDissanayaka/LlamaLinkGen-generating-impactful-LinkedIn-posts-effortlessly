@@ -4,15 +4,21 @@ from typing import Annotated, Sequence, TypedDict
 from langchain_core.messages import BaseMessage
 from langgraph.graph import add_messages
 from langchain_groq.chat_models import ChatGroq
+from langchain_openai.chat_models import ChatOpenAI
 
 load_dotenv(find_dotenv())
 
 
 os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
 
-llm=ChatGroq(
+'''llm=ChatGroq(
     model_name="llama-3.3-70b-versatile",
     temperature=0.7
+)'''
+
+llm=ChatOpenAI(
+    model_name="gpt-4",
+    temperature=0.5
 )
 
 
