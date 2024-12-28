@@ -11,20 +11,13 @@ load_dotenv(find_dotenv())
 
 os.environ["GROQ_API_KEY"]=os.getenv("GROQ_API_KEY")
 
-'''llm=ChatGroq(
+llm=ChatGroq(
     model_name="llama-3.3-70b-versatile",
     temperature=0.7
-)'''
-
-llm=ChatOpenAI(
-    model_name="gpt-4",
-    temperature=0.5
 )
 
 
 class GraphState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
-    router_state: Annotated[Sequence[BaseMessage], add_messages]
-    context: str
 
 
