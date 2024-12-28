@@ -1,1 +1,1 @@
-from .market_research import market_researcher
+from .market_research import market_researcher, market_researcher_to_tool, market_researcher_tool

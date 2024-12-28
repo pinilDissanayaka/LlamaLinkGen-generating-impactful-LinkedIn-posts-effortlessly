@@ -6,6 +6,7 @@ from  langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
 from langchain_core.messages import AIMessage, ToolMessage, HumanMessage
+from langgraph.prebuilt import ToolNode
 
 
 
@@ -49,9 +50,25 @@ def market_researcher(state: GraphState):
         {"LINKEDIN_ACCOUNT_DESCRIPTION" : message, "CURRENT_DATE": current_date}
     )
 
+    print(market_researcher_chain_response)
+
     return {
         "messages": market_researcher_chain_response
     }
+
+
+def market_researcher_to_tool(state:GraphState)->str:
+    message=state["messages"][-1].tool_calls
+
+    if message:
+        return "TOOL_CALL"
+    else:
+        return "NO_TOOL_CALL"
+
+
+
+market_researcher_tool=ToolNode([DuckDuckGoSearchResults(api_wrapper=DuckDuckGoSearchAPIWrapper())])
+    
 
 
 
