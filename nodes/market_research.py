@@ -7,6 +7,47 @@ from langchain_community.tools import DuckDuckGoSearchResults
 from langchain_community.utilities import DuckDuckGoSearchAPIWrapper
 from langchain_core.messages import AIMessage, ToolMessage, HumanMessage
 from langgraph.prebuilt import ToolNode
+import requests
+from langchain_core.tools import tool
+import json
+import os
+
+
+def search(query:str, limit=2):
+    url="https://google.serper.dev/search"
+    payload = json.dumps({
+        "q": query,
+        "num": limit
+    })
+        
+    headers = {
+        'X-API-KEY': os.getenv("X-API-KEY"),
+        'Content-Type': 'application/json'
+    }
+        
+        
+    response = requests.request("POST", url, headers=headers, data=payload).json()["organic"]
+        
+    string = []
+
+    for result in response :
+        string.append(f"{result['title']}\n{result['snippet']}\n{result['link']}\n\n")
+
+    return f"Search results for '{query}':\n\n" + "\n".join(string)
+
+
+@tool
+def search_linkedin(query: str) -> str:
+    """
+    Searches for the given query on LinkedIn and returns the search results.
+
+    Parameters:
+    query (str): The search query to search for on LinkedIn
+
+    Returns:
+    str: The search results
+    """
+    return search(f"site:linkedin.com {query}")
 
 
 
@@ -36,7 +77,7 @@ def market_researcher(state: GraphState):
     current_date = datetime.now().strftime("%Y-%m-%d")
     message=state["messages"][-1].content
 
-    llm_with_tools = llm.bind_tools([DuckDuckGoSearchResults(api_wrapper=DuckDuckGoSearchAPIWrapper())])
+    llm_with_tools = llm.bind_tools([search_linkedin])
 
 
     market_researcher_chain = (
@@ -67,7 +108,7 @@ def market_researcher_to_tool(state:GraphState)->str:
 
 
 
-market_researcher_tool=ToolNode([DuckDuckGoSearchResults(api_wrapper=DuckDuckGoSearchAPIWrapper())])
+market_researcher_tool=ToolNode([search_linkedin])
     
 
 
